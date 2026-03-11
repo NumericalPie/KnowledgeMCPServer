@@ -1,0 +1,12 @@
+venv/
+.venv/
+__pycache__/
+*.pyc
+*.pkl
+.DS_Store
+
+# Keep the data scaffold, ignore generated contents.
+data/docs/*
+!data/docs/.gitkeep
+data/vectorstore/*
+!data/vectorstore/.gitkeep

@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>KnowledgeMCPServer</title>
+    <style>
+      body { font-family: system-ui, Arial; max-width: 900px; margin: 24px auto; padding: 16px; }
+      input, textarea, button { font-size: 14px; }
+      .card { border: 1px solid #ddd; padding: 12px; margin: 8px 0; border-radius: 6px; }
+      .row { display:flex; gap:8px; align-items:center; }
+      pre { white-space: pre-wrap; }
+    </style>
+  </head>
+  <body>
+    <h1>KnowledgeMCPServer — Web UI</h1>
+
+    <section class="card">
+      <h2>Index a URL</h2>
+      <div class="row">
+        <input id="urlInput" placeholder="https://example.com/article" style="flex:1" />
+        <button id="indexUrlBtn">Index URL</button>
+      </div>
+      <div id="indexUrlStatus"></div>
+    </section>
+
+    <section class="card">
+      <h2>Index PDF File</h2>
+      <div class="row">
+        <input type="file" id="pdfInput" accept=".pdf" style="flex:1" />
+        <button id="indexPdfBtn">Index PDF</button>
+      </div>
+      <div id="indexPdfStatus"></div>
+    </section>
+
+    <section class="card">
+      <h2>Index TeX File</h2>
+      <div class="row">
+        <input type="file" id="texInput" accept=".tex,.latex" style="flex:1" />
+        <button id="indexTexBtn">Index TeX</button>
+      </div>
+      <div id="indexTexStatus"></div>
+    </section>
+
+    <section class="card">
+      <h2>Add Markdown</h2>
+      <input id="mdTitle" placeholder="Title (optional)" style="width:100%" />
+      <textarea id="mdText" rows="6" style="width:100%" placeholder="# Markdown...\n\nThis is documentation"></textarea>
+      <div class="row">
+        <input id="mdRepo" placeholder="Repo name (optional)" />
+        <button id="addMdBtn">Add Markdown</button>
+      </div>
+      <div id="addMdStatus"></div>
+    </section>
+
+    <section class="card">
+      <h2>Query</h2>
+      <div class="row">
+        <input id="qInput" placeholder="Ask something..." style="flex:1" />
+        <input id="topK" value="3" style="width:72px" />
+        <button id="queryBtn">Query</button>
+      </div>
+      <div id="queryResults"></div>
+    </section>
+
+    <section class="card">
+      <h2>Documents</h2>
+      <button id="listDocsBtn">List Documents</button>
+      <div id="docsList"></div>
+    </section>
+
+    <script src="/static/app.js"></script>
+  </body>
+</html>

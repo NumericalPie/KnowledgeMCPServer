@@ -1,0 +1,83 @@
+[project]
+name = "knowledge-mcp-server"
+version = "0.1.0"
+description = "Knowledge MCP server — RAG system with MCP server support"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "sentence-transformers>=2.2.2",
+    "pdfminer-six>=20220524",
+    "beautifulsoup4>=4.12.2",
+    "requests>=2.31.0",
+    "numpy>=1.25.0",
+    "fastapi>=0.95.0",
+    "uvicorn>=0.22.0",
+    "python-multipart>=0.0.6",
+    "mcp>=1.0.0",
+    "pydantic>=2.5.1",
+]
+
+[project.scripts]
+knowledge-mcp = "knowledge_mcp_server.cli:main"
+knowledge-mcp-server = "knowledge_mcp_server.mcp_server:main"
+knowledge-mcp-stdio = "knowledge_mcp_server.mcp_stdio_server:main"
+
+[build-system]
+requires = ["uv_build>=0.9.8,<0.10.0"]
+build-backend = "uv_build"
+
+[dependency-groups]
+dev = [
+    "ruff>=0.8.0",
+    "pytest>=8.0.0",
+    "pytest-mock>=3.12.0",
+]
+
+[tool.ruff]
+target-version = "py312"
+line-length = 100
+fix = true              # Enable automatic fixes for lint violations
+unsafe-fixes = false    # Disable unsafe fixes that may change code behavior
+lint.extend-select = [
+    "F",        # Pyflakes rules (ruff's default)
+    "E",        # PyCodeStyle errors (ruff's default)
+    "W",        # PyCodeStyle warnings
+    "ANN",      # Enforce type annotations
+    "S",        # Security-related rules (flake8-bandit)
+    "BLE",      # Blind-except rules
+    "FBT",      # Boolean trap rules
+    "A",        # Shadowing built-ins
+    "I",        # Sort imports properly
+    "C4",       # Catch incorrect use of comprehensions, dict, list, etc
+    "C90",      # Complexity rules
+    "PERF",     # Performance-related rules
+    "N",        # Naming conventions
+    "RUF",      # Ruff-specific rules
+    "TRY",      # Try/Except related rules
+    "FIX",      # Fixme comments
+    "SIM",      # Simplification rules
+    "ARG",      # Function argument rules
+    "PTH",      # Requires pathlib
+    "FA",       # Enforce from __future__ import annotations
+    "ISC",      # Good use of string concatenation
+    "ICN",      # Use common import conventions
+    "RET",      # Good return practices
+    "SIM",      # Common simplification rules
+    "TID",      # Some good import practices
+    "TC",       # Enforce importing certain types in a TYPE_CHECKING block
+    "PTH",      # Use pathlib instead of os.path
+    "TD",       # Be diligent with TODO comments
+    "NPY",      # Some numpy-specific things
+    "UP",       # Warn if certain things can changed due to newer Python versions
+]
+exclude = [
+    ".git",
+    "__pycache__",
+    "venv",
+    ".venv",
+    "dist",
+    "build",
+    ]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**/*.py" = ["S101", "ANN"]  # Allow assert, skip ANN and allow unused test args
