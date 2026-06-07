@@ -12,6 +12,7 @@ Endpoints:
 This server uses the package's LocalTextStore, Embeddings, and InMemoryVectorStore.
 """
 
+import logging
 import tempfile
 import uuid
 from contextlib import suppress
@@ -29,6 +30,10 @@ from knowledge_mcp_server.indexers import index_pdf, index_tex, index_website
 from knowledge_mcp_server.storage import LocalTextStore
 from knowledge_mcp_server.vectorstore import InMemoryVectorStore
 
+logger = logging.getLogger(__name__)
+
+_WEB_UI = Path(__file__).parent.parent.parent / "web_ui"
+
 app = FastAPI(title="knowledge_mcp_server MCP")
 
 # initialize components (in-memory) and try to load persisted vectorstore
@@ -36,16 +41,18 @@ store = LocalTextStore()
 emb = Embeddings()
 try:
     vecstore = InMemoryVectorStore.load(root=store.root)
+    logger.info("Loaded existing vector store")
 except (FileNotFoundError, OSError):
     vecstore = InMemoryVectorStore()
+    logger.info("Created new vector store")
 
 # mount static web UI under /static and serve index.html at root
-app.mount("/static", StaticFiles(directory="web_ui"), name="static")
+app.mount("/static", StaticFiles(directory=str(_WEB_UI)), name="static")
 
 
 @app.get("/", include_in_schema=False)
 def serve_index() -> FileResponse:
-    return FileResponse("web_ui/index.html")
+    return FileResponse(str(_WEB_UI / "index.html"))
 
 
 class AddDocReq(BaseModel):
@@ -208,7 +215,7 @@ def query(req: QueryReq) -> dict[str, list[dict]]:
     methods=["GET", "POST"],
     include_in_schema=False,
 )
-def well_known_manifest() -> dict[str, str | dict]:
+def well_known_manifest() -> dict:
     """Return a minimal MCP manifest describing the server's tools.
 
     This manifest advertises no authentication so it matches the server's
@@ -262,53 +269,12 @@ def well_known_manifest() -> dict[str, str | dict]:
             },
         ],
     }
-    # Accept both GET and POST to be tolerant of clients that POST the manifest URL.
-    return {
-        "name": "DevKnowledge MCP (local)",
-        "version": "0.1",
-        "description": "Minimal MCP manifest for the local RAG/MCP server",
-        "api": {
-            "post_doc": f"{base}/mcp/documents",
-            "list_docs": f"{base}/mcp/documents",
-            "get_doc": f"{base}/mcp/documents/{{doc_id}}",
-            "query": f"{base}/mcp/query",
-            "index_url": f"{base}/mcp/index_url",
-            "index_pdf": f"{base}/mcp/index_pdf",
-            "index_tex": f"{base}/mcp/index_tex",
-        },
-        "auth": {"type": "none"},
-        "tools": [
-            {
-                "name": "post_doc",
-                "description": "Add a markdown document via POST /mcp/documents",
-            },
-            {
-                "name": "list_docs",
-                "description": "List stored documents via GET /mcp/documents",
-            },
-            {
-                "name": "get_doc",
-                "description": "Get raw document text via GET /mcp/documents/{doc_id}",
-            },
-            {
-                "name": "query",
-                "description": "Query the vectorstore via POST /mcp/query",
-            },
-            {
-                "name": "index_url",
-                "description": "Fetch and index a URL via POST /mcp/index_url",
-            },
-            {
-                "name": "index_pdf",
-                "description": "Upload and index a PDF file via POST /mcp/index_pdf",
-            },
-            {
-                "name": "index_tex",
-                "description": "Upload and index a TeX file via POST /mcp/index_tex",
-            },
-        ],
-    }
+
+
+def main() -> None:
+    logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s %(message)s")
+    uvicorn.run(app, host="127.0.0.1", port=8000)
 
 
 if __name__ == "__main__":
-    uvicorn.run(app, host="127.0.0.1", port=8000)
+    main()

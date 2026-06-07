@@ -74,9 +74,9 @@ def index_tex(
     chunk_size: int = 800,
 ) -> list[str]:
     raw = Path(path).read_text(encoding="utf-8")
-    # very naive strip of LaTeX commands
-    text = re.sub(r"\\\\[a-zA-Z]+\{.*?\}", "", raw)
-    text = re.sub(r"\\\\[a-zA-Z]+", "", text)
+    # strip LaTeX commands: \cmd{...} and bare \cmd
+    text = re.sub(r"\\[a-zA-Z]+\{.*?\}", "", raw)
+    text = re.sub(r"\\[a-zA-Z]+", "", text)
     base_id = Path(path).stem
     chunks = _chunk_text(text, chunk_size=chunk_size)
     ids = []

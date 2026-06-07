@@ -1,4 +1,5 @@
 import argparse
+import logging
 import sys
 from collections.abc import Sequence
 
@@ -7,30 +8,28 @@ from .indexers import index_pdf, index_tex, index_website
 from .storage import LocalTextStore
 from .vectorstore import InMemoryVectorStore
 
+logger = logging.getLogger(__name__)
+
 
 def _load_or_create_vecstore(root: str) -> InMemoryVectorStore:
-    """Load an existing InMemoryVectorStore or return a new one.
-
-    Keeps error handling centralized so `main` remains simple and
-    easier to test.
-    """
     try:
         vecstore = InMemoryVectorStore.load(root=root)
-        print("Loaded existing vector store")
+        logger.info("Loaded existing vector store")
     except (FileNotFoundError, OSError):
         vecstore = InMemoryVectorStore()
-        print("Created new vector store")
+        logger.info("Created new vector store")
     except Exception as exc:  # pragma: no cover - defensive fallback
         if isinstance(exc, (KeyboardInterrupt, SystemExit)):
             raise
-        print(f"Warning: failed to load existing vector store: {exc}")
+        logger.warning("Failed to load existing vector store: %s", exc)
         vecstore = InMemoryVectorStore()
-        print("Created new vector store")
+        logger.info("Created new vector store")
 
     return vecstore
 
 
 def main(argv: Sequence[str] | None = None) -> None:
+    logging.basicConfig(level=logging.INFO, format="%(levelname)s %(message)s")
     parser = argparse.ArgumentParser("knowledge_mcp_server CLI")
     sub = parser.add_subparsers(dest="cmd")
 
@@ -50,25 +49,24 @@ def main(argv: Sequence[str] | None = None) -> None:
         indexed = False
         if args.pdf:
             ids = index_pdf(args.pdf, store, embeddings, vecstore)
-            print("Indexed PDF chunks:", len(ids))
+            logger.info("Indexed PDF chunks: %d", len(ids))
             indexed = True
         if args.tex:
             ids = index_tex(args.tex, store, embeddings, vecstore)
-            print("Indexed TeX chunks:", len(ids))
+            logger.info("Indexed TeX chunks: %d", len(ids))
             indexed = True
         if args.url:
             ids = index_website(args.url, store, embeddings, vecstore)
-            print("Indexed URL chunks:", len(ids))
+            logger.info("Indexed URL chunks: %d", len(ids))
             indexed = True
         if not (args.pdf or args.tex or args.url):
-            print("No input specified. Use --pdf, --tex or --url")
-        # Persist vector store after indexing
+            logger.warning("No input specified. Use --pdf, --tex or --url")
         if indexed:
             try:
                 vecstore.save(root=store.root)
-                print("Vector store saved successfully")
+                logger.info("Vector store saved successfully")
             except OSError as e:
-                print(f"Warning: Failed to save vector store: {e}")
+                logger.warning("Failed to save vector store: %s", e)
     else:
         parser.print_help()
 
