@@ -7,7 +7,7 @@ VS Code/GitHub Copilot integration.
 from __future__ import annotations
 
 import asyncio
-import logging  # ADR-0003 exemption: loguru uses stderr, corrupting the stdio JSON-RPC stream
+import logging  # ADR-0003 exemption: stdout/stderr must stay clean for JSON-RPC; uses file sink
 import tempfile
 import uuid
 from contextlib import suppress
