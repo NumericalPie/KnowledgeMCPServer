@@ -1,14 +1,18 @@
+from __future__ import annotations
+
 import argparse
-import logging
 import sys
-from collections.abc import Sequence
+from typing import TYPE_CHECKING
+
+from loguru import logger
+
+if TYPE_CHECKING:
+    from collections.abc import Sequence
 
 from .embeddings import Embeddings
 from .indexers import index_pdf, index_tex, index_website
 from .storage import LocalTextStore
 from .vectorstore import InMemoryVectorStore
-
-logger = logging.getLogger(__name__)
 
 
 def _load_or_create_vecstore(root: str) -> InMemoryVectorStore:
@@ -21,7 +25,7 @@ def _load_or_create_vecstore(root: str) -> InMemoryVectorStore:
     except Exception as exc:  # pragma: no cover - defensive fallback
         if isinstance(exc, (KeyboardInterrupt, SystemExit)):
             raise
-        logger.warning("Failed to load existing vector store: %s", exc)
+        logger.warning("Failed to load existing vector store: {}", exc)
         vecstore = InMemoryVectorStore()
         logger.info("Created new vector store")
 
@@ -29,7 +33,6 @@ def _load_or_create_vecstore(root: str) -> InMemoryVectorStore:
 
 
 def main(argv: Sequence[str] | None = None) -> None:
-    logging.basicConfig(level=logging.INFO, format="%(levelname)s %(message)s")
     parser = argparse.ArgumentParser("knowledge_mcp_server CLI")
     sub = parser.add_subparsers(dest="cmd")
 
@@ -49,15 +52,15 @@ def main(argv: Sequence[str] | None = None) -> None:
         indexed = False
         if args.pdf:
             ids = index_pdf(args.pdf, store, embeddings, vecstore)
-            logger.info("Indexed PDF chunks: %d", len(ids))
+            logger.info("Indexed PDF chunks: {}", len(ids))
             indexed = True
         if args.tex:
             ids = index_tex(args.tex, store, embeddings, vecstore)
-            logger.info("Indexed TeX chunks: %d", len(ids))
+            logger.info("Indexed TeX chunks: {}", len(ids))
             indexed = True
         if args.url:
             ids = index_website(args.url, store, embeddings, vecstore)
-            logger.info("Indexed URL chunks: %d", len(ids))
+            logger.info("Indexed URL chunks: {}", len(ids))
             indexed = True
         if not (args.pdf or args.tex or args.url):
             logger.warning("No input specified. Use --pdf, --tex or --url")
@@ -66,7 +69,7 @@ def main(argv: Sequence[str] | None = None) -> None:
                 vecstore.save(root=store.root)
                 logger.info("Vector store saved successfully")
             except OSError as e:
-                logger.warning("Failed to save vector store: %s", e)
+                logger.warning("Failed to save vector store: {}", e)
     else:
         parser.print_help()
 

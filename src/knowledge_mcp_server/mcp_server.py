@@ -12,7 +12,8 @@ Endpoints:
 This server uses the package's LocalTextStore, Embeddings, and InMemoryVectorStore.
 """
 
-import logging
+from __future__ import annotations
+
 import tempfile
 import uuid
 from contextlib import suppress
@@ -23,14 +24,13 @@ import uvicorn
 from fastapi import FastAPI, File, HTTPException, UploadFile
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
+from loguru import logger
 from pydantic import BaseModel
 
 from knowledge_mcp_server.embeddings import Embeddings
 from knowledge_mcp_server.indexers import index_pdf, index_tex, index_website
 from knowledge_mcp_server.storage import LocalTextStore
 from knowledge_mcp_server.vectorstore import InMemoryVectorStore
-
-logger = logging.getLogger(__name__)
 
 _WEB_UI = Path(__file__).parent.parent.parent / "web_ui"
 
@@ -272,7 +272,6 @@ def well_known_manifest() -> dict:
 
 
 def main() -> None:
-    logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s %(message)s")
     uvicorn.run(app, host="127.0.0.1", port=8000)
 
 
