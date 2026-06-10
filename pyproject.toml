@@ -3,7 +3,7 @@ name = "knowledge-mcp-server"
 version = "0.1.0"
 description = "Knowledge MCP server — RAG system with MCP server support"
 readme = "README.md"
-requires-python = ">=3.12"
+requires-python = ">=3.13"
 dependencies = [
     "sentence-transformers>=2.2.2",
     "pdfminer-six>=20220524",
@@ -15,6 +15,7 @@ dependencies = [
     "python-multipart>=0.0.6",
     "mcp>=1.0.0",
     "pydantic>=2.5.1",
+    "loguru>=0.7.0",
 ]
 
 [project.scripts]
@@ -34,10 +35,10 @@ dev = [
 ]
 
 [tool.ruff]
-target-version = "py312"
+target-version = "py313"
 line-length = 100
-fix = true              # Enable automatic fixes for lint violations
-unsafe-fixes = false    # Disable unsafe fixes that may change code behavior
+fix = true
+unsafe-fixes = false
 lint.extend-select = [
     "F",        # Pyflakes rules (ruff's default)
     "E",        # PyCodeStyle errors (ruff's default)
@@ -54,7 +55,6 @@ lint.extend-select = [
     "N",        # Naming conventions
     "RUF",      # Ruff-specific rules
     "TRY",      # Try/Except related rules
-    "FIX",      # Fixme comments
     "SIM",      # Simplification rules
     "ARG",      # Function argument rules
     "PTH",      # Requires pathlib
@@ -62,10 +62,8 @@ lint.extend-select = [
     "ISC",      # Good use of string concatenation
     "ICN",      # Use common import conventions
     "RET",      # Good return practices
-    "SIM",      # Common simplification rules
     "TID",      # Some good import practices
     "TC",       # Enforce importing certain types in a TYPE_CHECKING block
-    "PTH",      # Use pathlib instead of os.path
     "TD",       # Be diligent with TODO comments
     "NPY",      # Some numpy-specific things
     "UP",       # Warn if certain things can changed due to newer Python versions
