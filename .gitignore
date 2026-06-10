@@ -10,3 +10,8 @@ data/docs/*
 !data/docs/.gitkeep
 data/vectorstore/*
 !data/vectorstore/.gitkeep
+.scratch/
+.claude/
+CLAUDE.md
+.mcp.json
+uv.lock

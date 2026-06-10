@@ -4,8 +4,10 @@ This implements the Model Context Protocol over stdio (JSON-RPC) for proper
 VS Code/GitHub Copilot integration.
 """
 
+from __future__ import annotations
+
 import asyncio
-import logging
+import logging  # ADR-0003 exemption: stdout/stderr must stay clean for JSON-RPC; uses file sink
 import tempfile
 import uuid
 from contextlib import suppress
